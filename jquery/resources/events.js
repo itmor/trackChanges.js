@@ -1,5 +1,6 @@
 $(function () {
   var Events = function () {
+
     var root = this;
 
     var storage = [];
@@ -30,7 +31,11 @@ $(function () {
       
     }
 
-    this.add =function (params) {
+    this.add = function (params) {
+      
+    }
+
+    this.remove = function (params) {
       
     }
   }
