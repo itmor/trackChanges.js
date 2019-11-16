@@ -1,3 +1,5 @@
 node_modules
-index.html
 package-lock.json
+build/events-connection.min.js
+resources/events-connection.js
+index.html
