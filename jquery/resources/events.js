@@ -29,6 +29,10 @@ $(function () {
     this.off = function (params) {
       
     }
+
+    this.add =function (params) {
+      
+    }
   }
 
   window.Events = Events;
