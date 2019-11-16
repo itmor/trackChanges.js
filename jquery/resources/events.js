@@ -3,9 +3,9 @@ $(function () {
 
     var root = this;
 
-    var storage = [];
+    var taskStorage = [];
 
-    var description = {};
+    var descriptionsEventsStorage = {};
 
     var workerState = {
 
@@ -31,11 +31,21 @@ $(function () {
       
     }
 
-    this.add = function (params) {
-      
+    this.add = function (descriptionEvent) {
+      if (typeof descriptionEvent === 'object') {
+        Object.keys(descriptionEvent).forEach(function (key) {
+          if (typeof descriptionEvent[key] === 'function') {
+            descriptionsEventsStorage[key] = descriptionEvent[key];
+          } else {
+            throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
+          }
+        });
+      } else {
+        throw new Error('Incorrect event description, description is not an object.');
+      }
     }
 
-    this.remove = function (params) {
+    this.remove = function (descriptionEvent) {
       
     }
   }
