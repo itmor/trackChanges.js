@@ -45,8 +45,10 @@ $(function () {
       }
     }
 
-    this.remove = function (descriptionEvent) {
-      
+    this.remove = function (nameDescriptionEvent) {
+      if (descriptionsEventsStorage[nameDescriptionEvent] !== undefined && typeof nameDescriptionEvent === 'string') {
+        delete descriptionsEventsStorage[nameDescriptionEvent];
+      }
     }
   }
 
