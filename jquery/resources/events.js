@@ -5,30 +5,40 @@ $(function () {
 
     var taskStorage = [];
 
-    var descriptionsEventsStorage = {};
+    var descriptionsEventsStorage = {
+
+    }
 
     var workerState = {
 
     }
 
     var worker = function (params) {
-      
+
     }
 
     var checkTaskInStorage = function (params) {
-      
+
     }
 
-    var dispatcher = function (params) {
-      
+    var dispatcher = function (eventName, callback, action, onceMode) {
+
     }
 
-    this.on = function (params) {
-      
+    this.on = function (eventName, callback, onceMode) {
+      if ((typeof eventName === 'string' && typeof callback === 'function') && (typeof onceMode === 'boolean' || onceMode === undefined)) {
+        dispatcher(eventName, callback, 'addTask', onceMode);
+      } else if (typeof eventName !== 'string' || typeof callback !== 'function' || typeof onceMode !== 'boolean' || onceMode !== undefined) {
+        throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
+      }
     }
 
-    this.off = function (params) {
-      
+    this.off = function (eventName, callback) {
+      if (typeof eventName === 'string' && typeof callback === 'function') {
+        dispatcher(eventName, callback, 'removeTask');
+      } else if (typeof eventName !== 'string' || typeof callback !== 'function') {
+        throw new Error('Error remove listener. Scheme .off(string: eventName, function: callback)');
+      }
     }
 
     this.add = function (descriptionEvent) {
