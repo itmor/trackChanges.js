@@ -5,12 +5,11 @@ $(function () {
 
     var taskStorage = [];
 
-    var descriptionsEventsStorage = {
-
-    }
+    var descriptionsEventsStorage = {}
 
     var workerState = {
-
+      activated: false,
+      callInterval: 500
     }
 
     var worker = function (params) {
