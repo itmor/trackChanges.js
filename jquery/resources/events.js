@@ -9,11 +9,46 @@ $(function () {
 
     var workerState = {
       activated: false,
-      callInterval: 500
+      callInterval: 200
     }
 
     var worker = function (params) {
+      if (workerState.activated === false) {
+        workerState.activated = true;
 
+        var work = setInterval(function () {
+          if (taskStorage.length === 0) {
+            workerState.activated = false;
+            clearInterval(work);
+          }
+
+          for (var i = 0; i < taskStorage.length; i++) {
+            var currentTask = taskStorage[i];
+            var eventName = currentTask[0];
+            var callback = currentTask[1];
+            var activated = currentTask[2]['activated'];
+            var remove = currentTask[2]['remove'];
+            var once = currentTask[2]['once'];
+
+            if (descriptionsEventsStorage[eventName]() === true && activated === false) {
+              callback();
+              taskStorage[i][2]['activated'] = true;
+            }
+
+            if (remove === true) {
+              taskStorage.splice(i, 1);
+            }
+
+            if (once === true && activated === true) {
+              taskStorage.splice(i, 1);
+            }
+
+            if (activated === true && descriptionsEventsStorage[eventName]() === false) {
+              taskStorage[i][2]['activated'] = false;
+            }
+          }
+        }, workerState.callInterval);
+      }
     }
 
     var addMarkerInTask = function (eventName, callback, marker) {
@@ -39,6 +74,8 @@ $(function () {
             once: onceMode
           }
         ]);
+
+        worker();
       }
 
       if (action === 'removeTask' && descriptionsEventsStorage[eventName] !== undefined) {
