@@ -17,12 +17,37 @@ $(function () {
 
     }
 
-    var checkTaskInStorage = function (params) {
-
+    var addMarkerInTask = function (eventName, callback, marker) {
+      for (var i = 0; i < taskStorage.length; i++) {
+        if (taskStorage[i][0] === eventName && taskStorage[i][1] === callback) {
+          taskStorage[i][2][marker.name] = marker.value;
+        }
+      }
     }
 
     var dispatcher = function (eventName, callback, action, onceMode) {
+      if (descriptionsEventsStorage[eventName] === undefined) {
+        throw new Error('No "' + eventName + '" event found first describe it through the .add(...) method ');
+      }
 
+      if (action === 'addTask' && descriptionsEventsStorage[eventName] !== undefined) {
+        taskStorage.push([
+          eventName,
+          callback,
+          {
+            activated: false,
+            remove: false,
+            once: onceMode
+          }
+        ]);
+      }
+
+      if (action === 'removeTask' && descriptionsEventsStorage[eventName] !== undefined) {
+        addMarkerInTask(eventName, callback, {
+          name: 'remove',
+          value: true
+        });
+      }
     }
 
     this.on = function (eventName, callback, onceMode) {
