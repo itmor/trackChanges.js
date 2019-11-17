@@ -1,15 +1,20 @@
 $(function () {
-  var Events = function () {
+  var Events = function (options) {
 
-    var root = this;
+    var vars = {
+      workerCallInterval: 200
+    }
+    
+    this.construct = function (options) {
+      $.extend(vars, options);
+    };
 
     var taskStorage = [];
 
     var descriptionsEventsStorage = {}
 
     var workerState = {
-      activated: false,
-      callInterval: 200
+      activated: false
     }
 
     var worker = function (params) {
@@ -47,7 +52,7 @@ $(function () {
               taskStorage[i][2]['activated'] = false;
             }
           }
-        }, workerState.callInterval);
+        }, vars.workerCallInterval);
       }
     }
 
@@ -121,6 +126,8 @@ $(function () {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
+
+    this.construct(options);
   }
 
   window.Events = Events;
