@@ -1,0 +1,6 @@
+node_modules
+package-lock.json
+build/events-connection.min.js
+resources/events-connection.js
+jquery.js
+index.html
