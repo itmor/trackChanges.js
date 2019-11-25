@@ -26,7 +26,7 @@
            root.workerState.activated = false;
             clearInterval(work);
           }
-     
+          console.log('Work');
           for (var i = 0; i < root.taskStorage.length; i++) {
             var currentTask = root.taskStorage[i];
             var eventName = currentTask[0];
@@ -35,7 +35,11 @@
             var remove = currentTask[2]['remove'];
             var once = currentTask[2]['once'];
 
-            if (root.descriptionsEventsStorage[eventName]() === true && activated === false) {
+            if (typeof root.descriptionsEventsStorage[eventName] !== 'function') {
+              root.taskStorage.splice(i, 1);
+            }
+
+            if (typeof root.descriptionsEventsStorage[eventName] === 'function' && root.descriptionsEventsStorage[eventName]() === true && activated === false) {
               callback();
               root.taskStorage[i][2]['activated'] = true;
             }
