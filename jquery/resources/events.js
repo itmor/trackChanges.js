@@ -34,8 +34,12 @@ $(function () {
             var activated = currentTask[2]['activated'];
             var remove = currentTask[2]['remove'];
             var once = currentTask[2]['once'];
-
-            if (descriptionsEventsStorage[eventName]() === true && activated === false) {
+            
+            if (typeof descriptionsEventsStorage[eventName] !== 'function') {
+              taskStorage.splice(i, 1);
+            }
+            
+            if (typeof descriptionsEventsStorage[eventName] === 'function' && descriptionsEventsStorage[eventName]() === true && activated === false) {
               callback();
               taskStorage[i][2]['activated'] = true;
             }
