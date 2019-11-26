@@ -31,3 +31,9 @@ function printText () {
 
 events.on('triggered', printText);
 ```
+| Method name | Description                    |
+| ------------- | ------------------------------ |
+| `.add(Object: eventsDescriptions)`      |  Adds event descriptions. It takes an object, the key is the name of the event, and its value should be a function that should return (true) when the event occurred. |
+| `.remove(String: eventName)`   | Deletes the event description. Accepts the name of the event, clears all handlers that were bound via .on(). |
+| `.on(String: eventName, Function: Callback, Boolean: onceMode)`     |Adds a listener. 1. Accepts the name of the event that was described using .add ().  2. Link to the function executed after the event.  3. Once mode, if true, then the listener will fire 1 time.|
+| `.off(String: eventName, Function: Callback)`   | Removes all listeners. Accepts listener names and a callback function link. |
