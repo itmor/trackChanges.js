@@ -1,4 +1,4 @@
-# Events-js
+# Events-js ![](https://svgshare.com/i/GR1.svg)
 Small library for creating and listening for js events
 #### Installation in JavaScript
 Find and download the file from the repository
