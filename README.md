@@ -11,22 +11,22 @@ include library file in html
 <script src="events.min.js"></script>
 ```
 
-#####Usage example
+#### Usage example
 ```javascript
 const events = new Events();
 
 let trigger = false;
 
 events.add({
-	triggered: () =>  {
-		if (trigger === true) {
-			return true;
-		}
-	}
+  triggered: () =>  {
+    if (trigger === true) {
+      return true;
+     }
+  }
 });
 
 function printText () {
-	console.log('Еhe trigger worked!');
+  console.log('Еhe trigger worked!');
 }
 
 events.on('triggered', printText);
@@ -43,22 +43,22 @@ include library file in html
 <script src="events.min.js"></script>
 ```
 
-#####Usage example
+#### Usage example
 ```javascript
 const events = new Events();
 
 let trigger = false;
 
 events.add({
-	triggered: () =>  {
-		if (trigger === true) {
-			return true;
-		}
-	}
+  triggered: () =>  {
+    if (trigger === true) {
+      return true;
+     }
+  }
 });
 
 function printText () {
-	console.log('Еhe trigger worked!');
+  console.log('Еhe trigger worked!');
 }
 
 events.on('triggered', printText);
