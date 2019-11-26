@@ -29,7 +29,7 @@ function printText () {
 	console.log('Еhe trigger worked!');
 }
 
-events.on('triggered', printText );
+events.on('triggered', printText);
 ```
 
 #### Installation in JQuery
@@ -61,5 +61,5 @@ function printText () {
 	console.log('Еhe trigger worked!');
 }
 
-events.on('triggered', printText );
+events.on('triggered', printText);
 ```
