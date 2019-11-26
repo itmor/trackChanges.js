@@ -31,6 +31,8 @@ function printText () {
 
 events.on('triggered', printText);
 ```
+
+### Methods
 | Method name | Description                    |
 | ------------- | ------------------------------ |
 | `.add(Object: eventsDescriptions)`      |  Adds event descriptions. It takes an object, the key is the name of the event, and its value should be a function that should return (true) when the event occurred. |
