@@ -1,9 +1,11 @@
 # Events-js ![](https://svgshare.com/i/GR1.svg)
 Small library for creating and listening for js events
+ ******
 #### Browser support
-##### IE 9+
-##### Firefox 20+
-##### Chrome 30+
+###### IE 9+
+###### Firefox 20+
+###### Chrome 30+
+ ******
 #### Installation
 Find and download the file from the repository
 ``
