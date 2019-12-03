@@ -5,6 +5,10 @@ Find and download the file from the repository
 ``
 events-js/***/build/events.min.js
 ``
+#### Browser support
+IE 9+
+Firefox 20+
+Chrome 30+
 
 include library file in html
 ```html
