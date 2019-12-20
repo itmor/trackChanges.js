@@ -22,11 +22,12 @@
         root.workerState.activated = true;
 
         var work = setInterval(function () {
+          
           if (root.taskStorage.length === 0) {
            root.workerState.activated = false;
             clearInterval(work);
           }
-          console.log('Work');
+
           for (var i = 0; i < root.taskStorage.length; i++) {
             var currentTask = root.taskStorage[i];
             var eventName = currentTask[0];

@@ -22,6 +22,7 @@ $(function () {
         workerState.activated = true;
 
         var work = setInterval(function () {
+          
           if (taskStorage.length === 0) {
             workerState.activated = false;
             clearInterval(work);
