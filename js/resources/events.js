@@ -51,7 +51,7 @@
               taskStorage.splice(i, 1);
             }
 
-            if (activated === true && descriptionsEventsStorage[eventName]() === false) {
+            if (activated === true && descriptionsEventsStorage[eventName]() !== true) {
               taskStorage[i][2]['activated'] = false;
             }
           }
