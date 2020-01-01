@@ -4,10 +4,6 @@ $(function () {
     var vars = {
       workerCallInterval: 200
     }
-    
-    this.construct = function (options) {
-      $.extend(vars, options);
-    };
 
     var taskStorage = [];
 
@@ -53,7 +49,7 @@ $(function () {
               taskStorage.splice(i, 1);
             }
 
-            if (activated === true && descriptionsEventsStorage[eventName]() === false) {
+            if (activated === true && descriptionsEventsStorage[eventName]() !== true) {
               taskStorage[i][2]['activated'] = false;
             }
           }
@@ -131,8 +127,12 @@ $(function () {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
+    
+    var construct = function (options) {
+      $.extend(vars, options);
+    };
 
-    this.construct(options);
+    construct(options);
   }
 
   window.Events = Events;
