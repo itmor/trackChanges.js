@@ -4,10 +4,6 @@ $(function () {
     var vars = {
       workerCallInterval: 200
     }
-    
-    this.construct = function (options) {
-      $.extend(vars, options);
-    };
 
     var taskStorage = [];
 
@@ -111,7 +107,7 @@ $(function () {
         throw new Error('Error remove listener. Scheme .off(string: eventName, function: callback)');
       }
     }
-
+    
     this.add = function (descriptionEvent) {
       if (typeof descriptionEvent === 'object') {
         Object.keys(descriptionEvent).forEach(function (key) {
@@ -131,8 +127,12 @@ $(function () {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
+    
+    var construct = function (options) {
+      $.extend(vars, options);
+    };
 
-    this.construct(options);
+    construct(options);
   }
 
   window.Events = Events;
