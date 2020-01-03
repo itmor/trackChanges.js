@@ -2,14 +2,14 @@
   function Events(options) {
 
     var storage = {
-      workerCallInterval: 200
+      workerCallInterval: 100
     }
 
     var root = this;
 
     var taskStorage = [];
 
-    var descriptionsEventsStorage = {}
+    var descriptionsEventsStorage = {};
 
     var workerState = {
       activated: false
@@ -17,7 +17,7 @@
 
     var worker = function () {
       if (workerState.activated === false) {
-         workerState.activated = true;
+        workerState.activated = true;
 
         var work = setInterval(function () {
 
@@ -33,26 +33,36 @@
             var activated = currentTask[2]['activated'];
             var remove = currentTask[2]['remove'];
             var once = currentTask[2]['once'];
+            var oldValue = currentTask[2]['oldValue'];
+            var typeEvent = currentTask[2]['type'];
 
-            if (typeof descriptionsEventsStorage[eventName] !== 'function') {
-              taskStorage.splice(i, 1);
-            }
+            if (typeEvent === 'triggerEvent') {
+              if (descriptionsEventsStorage[eventName].func() === true && activated === false) {
+                callback();
+                taskStorage[i][2]['activated'] = true;
+              }
 
-            if (typeof descriptionsEventsStorage[eventName] === 'function' && descriptionsEventsStorage[eventName]() === true && activated === false) {
-              callback();
-              taskStorage[i][2]['activated'] = true;
-            }
+              if (remove === true) taskStorage.splice(i, 1);
 
-            if (remove === true) {
-              taskStorage.splice(i, 1);
-            }
+              if (once === true && activated === true) taskStorage.splice(i, 1);
 
-            if (once === true && activated === true) {
-              taskStorage.splice(i, 1);
-            }
+              if (activated === true && descriptionsEventsStorage[eventName].func() !== true) {
+                taskStorage[i][2]['activated'] = false;
+              }
+            } else if (typeEvent === 'morphEvent') {
+              if (descriptionsEventsStorage[eventName].value() !== oldValue && activated === false) {
+                callback();
+                taskStorage[i][2]['activated'] = true;
+                taskStorage[i][2]['oldValue'] = descriptionsEventsStorage[eventName].value();
+              }
 
-            if (activated === true && descriptionsEventsStorage[eventName]() !== true) {
-              taskStorage[i][2]['activated'] = false;
+              if (remove === true) taskStorage.splice(i, 1);
+
+              if (once === true && activated === true) taskStorage.splice(i, 1);
+
+              if (activated === true && descriptionsEventsStorage[eventName].value() !== oldValue) {
+                taskStorage[i][2]['activated'] = false;
+              }
             }
           }
         }, storage.workerCallInterval);
@@ -68,25 +78,38 @@
     }
 
     var dispatcher = function (eventName, callback, action, onceMode) {
-      if (descriptionsEventsStorage[eventName] === undefined) {
-        throw new Error('No "' + eventName + '" event found first describe it through the .add(...) method ');
-      }
-
-      if (action === 'addTask' && descriptionsEventsStorage[eventName] !== undefined) {
+      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'morph') {
         taskStorage.push([
           eventName,
           callback,
           {
             activated: false,
             remove: false,
-            once: onceMode
+            once: onceMode,
+            type: 'morphEvent',
+            oldValue: descriptionsEventsStorage[eventName].value()
           }
         ]);
 
         worker();
       }
 
-      if (action === 'removeTask' && descriptionsEventsStorage[eventName] !== undefined) {
+      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'trigger') {
+        taskStorage.push([
+          eventName,
+          callback,
+          {
+            activated: false,
+            remove: false,
+            once: onceMode,
+            type: 'triggerEvent'
+          }
+        ]);
+
+        worker();
+      }
+
+      if (action === 'removeTask' && descriptionsEventsStorage.hasOwnProperty(eventName) === true) {
         addMarkerInTask(eventName, callback, {
           name: 'remove',
           value: true
@@ -95,37 +118,55 @@
     }
 
     this.on = function (eventName, callback, onceMode) {
-      if ((typeof eventName === 'string' && typeof callback === 'function') && (typeof onceMode === 'boolean' || onceMode === undefined)) {
-        dispatcher(eventName, callback, 'addTask', onceMode);
-      } else if (typeof eventName !== 'string' || typeof callback !== 'function' || typeof onceMode !== 'boolean' || onceMode !== undefined) {
+      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
+        throw new Error('Error adding listener. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
+      } else if (typeof eventName !== 'string' || typeof callback !== 'function' && (typeof onceMode !== 'boolean' || onceMode !== undefined)) {
         throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
+      } else {
+        dispatcher(eventName, callback, 'addTask', onceMode);
       }
     }
 
     this.off = function (eventName, callback) {
-      if (typeof eventName === 'string' && typeof callback === 'function') {
-        dispatcher(eventName, callback, 'removeTask');
+      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
+        throw new Error('Error deleting handler. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
       } else if (typeof eventName !== 'string' || typeof callback !== 'function') {
         throw new Error('Error remove listener. Scheme .off(string: eventName, function: callback)');
+      } else {
+        dispatcher(eventName, callback, 'removeTask');
       }
     }
 
-    this.add = function (descriptionEvent) {
-      if (typeof descriptionEvent === 'object') {
+    this.add = function (descriptionEvent, morph) {
+      if (typeof descriptionEvent === 'object' && morph === undefined) {
         Object.keys(descriptionEvent).forEach(function (key) {
           if (typeof descriptionEvent[key] === 'function') {
-            descriptionsEventsStorage[key] = descriptionEvent[key];
+            descriptionsEventsStorage[key] = {
+              func: descriptionEvent[key],
+              type: 'trigger'
+            }
+          } else {
+            throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
+          }
+        });
+      } else if (typeof descriptionEvent === 'object' && morph === 'morph') {
+        Object.keys(descriptionEvent).forEach(function (key) {
+          if (typeof descriptionEvent[key] === 'function') {
+            descriptionsEventsStorage[key] = {
+              value: descriptionEvent[key],
+              type: 'morph'
+            }
           } else {
             throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
           }
         });
       } else {
-        throw new Error('Incorrect event description, description is not an object.');
+        throw new Error('Incorrect event description.');
       }
     }
 
     this.remove = function (nameDescriptionEvent) {
-      if (descriptionsEventsStorage[nameDescriptionEvent] !== undefined && typeof nameDescriptionEvent === 'string') {
+      if (descriptionsEventsStorage.hasOwnProperty(nameDescriptionEvent) === true && typeof nameDescriptionEvent === 'string') {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
@@ -144,6 +185,6 @@
 
     construct(options);
   }
-  
+
   window.Events = Events;
 })();
