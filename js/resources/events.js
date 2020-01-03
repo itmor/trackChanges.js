@@ -120,7 +120,7 @@
     this.on = function (eventName, callback, onceMode) {
       if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
         throw new Error('Error adding listener. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
-      } else if (typeof eventName !== 'string' || typeof callback !== 'function' || typeof onceMode !== 'boolean' || onceMode !== undefined) {
+      } else if (typeof eventName !== 'string' || typeof callback !== 'function' && (typeof onceMode !== 'boolean' || onceMode !== undefined)) {
         throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
       } else {
         dispatcher(eventName, callback, 'addTask', onceMode);

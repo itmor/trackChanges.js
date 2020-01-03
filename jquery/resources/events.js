@@ -33,7 +33,7 @@ $(function () {
             var once = currentTask[2]['once'];
             var oldValue = currentTask[2]['oldValue'];
             var typeEvent = currentTask[2]['type'];
-
+            
             if (typeEvent === 'triggerEvent') {
               if (descriptionsEventsStorage[eventName].func() === true && activated === false) {
                 callback();
@@ -118,7 +118,7 @@ $(function () {
     this.on = function (eventName, callback, onceMode) {
       if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
         throw new Error('Error adding listener. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
-      } else if (typeof eventName !== 'string' || typeof callback !== 'function' || typeof onceMode !== 'boolean' || onceMode !== undefined) {
+      } else if (typeof eventName !== 'string' || typeof callback !== 'function' && (typeof onceMode !== 'boolean' || onceMode !== undefined)) {
         throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
       } else {
         dispatcher(eventName, callback, 'addTask', onceMode);
