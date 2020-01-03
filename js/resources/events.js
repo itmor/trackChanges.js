@@ -2,7 +2,7 @@
   function Events(options) {
 
     var storage = {
-      workerCallInterval: 200
+      workerCallInterval: 50
     }
 
     var root = this;

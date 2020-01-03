@@ -2,7 +2,7 @@ $(function () {
   var Events = function (options) {
 
     var vars = {
-      workerCallInterval: 200
+      workerCallInterval: 50
     }
 
     var taskStorage = [];
