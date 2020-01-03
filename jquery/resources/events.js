@@ -70,7 +70,7 @@ $(function () {
         throw new Error('No "' + eventName + '" event found first describe it through the .add(...) method ');
       }
 
-      if (action === 'addTask' && descriptionsEventsStorage[eventName] !== undefined) {
+      if (action === 'addTask' && descriptionsEventsStorage.hasOwnProperty(eventName) === true) {
         taskStorage.push([
           eventName,
           callback,
@@ -84,7 +84,7 @@ $(function () {
         worker();
       }
 
-      if (action === 'removeTask' && descriptionsEventsStorage[eventName] !== undefined) {
+      if (action === 'removeTask' && descriptionsEventsStorage.hasOwnProperty(eventName) === true) {
         addMarkerInTask(eventName, callback, {
           name: 'remove',
           value: true
@@ -123,7 +123,7 @@ $(function () {
     }
 
     this.remove = function (nameDescriptionEvent) {
-      if (descriptionsEventsStorage[nameDescriptionEvent] !== undefined && typeof nameDescriptionEvent === 'string') {
+      if (descriptionsEventsStorage.hasOwnProperty(nameDescriptionEvent) === true && typeof nameDescriptionEvent === 'string') {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
