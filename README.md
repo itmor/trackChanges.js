@@ -21,7 +21,7 @@ include library file in html
 
 #### Usage example
 ```javascript
-// trigger event
+//------------------------Trigger event--------------------------------
 const events = new Events();
 
 let menuOpen = false;
@@ -37,8 +37,8 @@ function printText () {
 }
 
 events.on('menuOpen', printText);
---------------------------------------------------------
-// morph event
+
+//------------------------Morph event--------------------------------
 const events = new Events();
 
 events.add({
