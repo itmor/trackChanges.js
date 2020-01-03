@@ -23,6 +23,7 @@ include library file in html
 ```javascript
 // trigger event
 const events = new Events();
+
 let menuOpen = false;
 
 events.add({
@@ -36,8 +37,10 @@ function printText () {
 }
 
 events.on('menuOpen', printText);
-
+--------------------------------------------------------
 // morph event
+const events = new Events();
+
 events.add({
   widthСhange: () =>  {
     return document.querySelector('div').clientWidth;
