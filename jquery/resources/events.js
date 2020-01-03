@@ -116,18 +116,22 @@ $(function () {
     }
 
     this.on = function (eventName, callback, onceMode) {
-      if ((typeof eventName === 'string' && typeof callback === 'function') && (typeof onceMode === 'boolean' || onceMode === undefined)) {
-        dispatcher(eventName, callback, 'addTask', onceMode);
+      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
+        throw new Error('Error adding listener. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
       } else if (typeof eventName !== 'string' || typeof callback !== 'function' || typeof onceMode !== 'boolean' || onceMode !== undefined) {
         throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
+      } else {
+        dispatcher(eventName, callback, 'addTask', onceMode);
       }
     }
 
     this.off = function (eventName, callback) {
-      if (typeof eventName === 'string' && typeof callback === 'function') {
-        dispatcher(eventName, callback, 'removeTask');
+      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
+        throw new Error('Error deleting handler. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
       } else if (typeof eventName !== 'string' || typeof callback !== 'function') {
         throw new Error('Error remove listener. Scheme .off(string: eventName, function: callback)');
+      } else {
+        dispatcher(eventName, callback, 'removeTask');
       }
     }
 
@@ -165,7 +169,7 @@ $(function () {
         delete descriptionsEventsStorage[nameDescriptionEvent];
       }
     }
-    
+
     var construct = function (options) {
       $.extend(storage, options);
     };
