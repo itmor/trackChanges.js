@@ -1,13 +1,13 @@
 $(function () {
   var Events = function (options) {
 
-    var vars = {
-      workerCallInterval: 50
+    var storage = {
+      workerCallInterval: 100
     }
 
     var taskStorage = [];
 
-    var descriptionsEventsStorage = {}
+    var descriptionsEventsStorage = {};
 
     var workerState = {
       activated: false
@@ -18,7 +18,7 @@ $(function () {
         workerState.activated = true;
 
         var work = setInterval(function () {
-          
+
           if (taskStorage.length === 0) {
             workerState.activated = false;
             clearInterval(work);
@@ -31,29 +31,39 @@ $(function () {
             var activated = currentTask[2]['activated'];
             var remove = currentTask[2]['remove'];
             var once = currentTask[2]['once'];
-            
-            if (typeof descriptionsEventsStorage[eventName] !== 'function') {
-              taskStorage.splice(i, 1);
-            }
-            
-            if (typeof descriptionsEventsStorage[eventName] === 'function' && descriptionsEventsStorage[eventName]() === true && activated === false) {
-              callback();
-              taskStorage[i][2]['activated'] = true;
-            }
+            var oldValue = currentTask[2]['oldValue'];
+            var typeEvent = currentTask[2]['type'];
 
-            if (remove === true) {
-              taskStorage.splice(i, 1);
-            }
+            if (typeEvent === 'triggerEvent') {
+              if (descriptionsEventsStorage[eventName].func() === true && activated === false) {
+                callback();
+                taskStorage[i][2]['activated'] = true;
+              }
 
-            if (once === true && activated === true) {
-              taskStorage.splice(i, 1);
-            }
+              if (remove === true) taskStorage.splice(i, 1);
 
-            if (activated === true && descriptionsEventsStorage[eventName]() !== true) {
-              taskStorage[i][2]['activated'] = false;
+              if (once === true && activated === true) taskStorage.splice(i, 1);
+
+              if (activated === true && descriptionsEventsStorage[eventName].func() !== true) {
+                taskStorage[i][2]['activated'] = false;
+              }
+            } else if (typeEvent === 'morphEvent') {
+              if (descriptionsEventsStorage[eventName].value() !== oldValue && activated === false) {
+                callback();
+                taskStorage[i][2]['activated'] = true;
+                taskStorage[i][2]['oldValue'] = descriptionsEventsStorage[eventName].value();
+              }
+
+              if (remove === true) taskStorage.splice(i, 1);
+
+              if (once === true && activated === true) taskStorage.splice(i, 1);
+
+              if (activated === true && descriptionsEventsStorage[eventName].value() !== oldValue) {
+                taskStorage[i][2]['activated'] = false;
+              }
             }
           }
-        }, vars.workerCallInterval);
+        }, storage.workerCallInterval);
       }
     }
 
@@ -66,18 +76,31 @@ $(function () {
     }
 
     var dispatcher = function (eventName, callback, action, onceMode) {
-      if (descriptionsEventsStorage[eventName] === undefined) {
-        throw new Error('No "' + eventName + '" event found first describe it through the .add(...) method ');
-      }
-
-      if (action === 'addTask' && descriptionsEventsStorage.hasOwnProperty(eventName) === true) {
+      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'morph') {
         taskStorage.push([
           eventName,
           callback,
           {
             activated: false,
             remove: false,
-            once: onceMode
+            once: onceMode,
+            type: 'morphEvent',
+            oldValue: descriptionsEventsStorage[eventName].value()
+          }
+        ]);
+
+        worker();
+      }
+
+      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'trigger') {
+        taskStorage.push([
+          eventName,
+          callback,
+          {
+            activated: false,
+            remove: false,
+            once: onceMode,
+            type: 'triggerEvent'
           }
         ]);
 
@@ -108,19 +131,34 @@ $(function () {
       }
     }
 
-    this.add = function (descriptionEvent) {
-      if (typeof descriptionEvent === 'object') {
+    this.add = function (descriptionEvent, morph) {
+      if (typeof descriptionEvent === 'object' && morph === undefined) {
         Object.keys(descriptionEvent).forEach(function (key) {
           if (typeof descriptionEvent[key] === 'function') {
-            descriptionsEventsStorage[key] = descriptionEvent[key];
+            descriptionsEventsStorage[key] = {
+              func: descriptionEvent[key],
+              type: 'trigger'
+            }
+          } else {
+            throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
+          }
+        });
+      } else if (typeof descriptionEvent === 'object' && morph === 'morph') {
+        Object.keys(descriptionEvent).forEach(function (key) {
+          if (typeof descriptionEvent[key] === 'function') {
+            descriptionsEventsStorage[key] = {
+              value: descriptionEvent[key],
+              type: 'morph'
+            }
           } else {
             throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
           }
         });
       } else {
-        throw new Error('Incorrect event description, description is not an object.');
+        throw new Error('Incorrect event description.');
       }
     }
+
 
     this.remove = function (nameDescriptionEvent) {
       if (descriptionsEventsStorage.hasOwnProperty(nameDescriptionEvent) === true && typeof nameDescriptionEvent === 'string') {
@@ -129,7 +167,7 @@ $(function () {
     }
     
     var construct = function (options) {
-      $.extend(vars, options);
+      $.extend(storage, options);
     };
 
     construct(options);
