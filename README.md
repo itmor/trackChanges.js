@@ -1,7 +1,7 @@
 # Events-js 
 ![](https://i.ibb.co/tJNCxDZ/losgo3.png)
 
-Small library for creating and listening for js events
+Small library for creating and listening for js events. v1.0.1
  ******
 #### Browser support
 ###### IE 9+
@@ -21,23 +21,34 @@ include library file in html
 
 #### Usage example
 ```javascript
+// trigger event
 const events = new Events();
-
-let trigger = false;
+let menuOpen = false;
 
 events.add({
-  triggered: () =>  {
-    if (trigger === true) {
-      return true;
-     }
+  menuOpen: () =>  {
+    if (menuOpen === true) return true;
   }
 });
 
 function printText () {
-  console.log('Еhe trigger worked!');
+  console.log('The menu open!');
 }
 
-events.on('triggered', printText);
+events.on('menuOpen', printText);
+
+// morph event
+events.add({
+  widthСhange: () =>  {
+    return document.querySelector('div').clientWidth;
+  }
+}, 'morph');
+
+function printText () {
+  console.log('Width has changed!');
+}
+
+events.on('widthСhange', printText);
 ```
 
 ### Methods
