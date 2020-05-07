@@ -1,12 +1,2 @@
-jquery/node_modules
-jquery/package-lock.json
-jquery/build/events-connection.min.js
-jquery/resources/events-connection.js
-jquery/jquery.js
-jquery/index.html
-
-js/node_modules
-js/package-lock.json
-js/build/events-connection.min.js
-js/resources/events-connection.js
-js/index.html
+node_modules
+package-lock.json
