@@ -1,9 +1,9 @@
 const gulp = require('gulp'),
       terser = require('gulp-terser'),
       rename = require('gulp-rename');
-
+// JS task
 gulp.task('compress', (done) => {
-  gulp.src('resources/*.js')
+  gulp.src('src/*.js')
     .pipe(rename({
       suffix: '.min'
     }))
@@ -14,7 +14,7 @@ gulp.task('compress', (done) => {
 
 // Watch task
 gulp.task('watch', () => {
-  gulp.watch('resources/*.js', gulp.series('compress'));
+  gulp.watch('src/*.js', gulp.series('compress'));
 });
 
 // Default task
