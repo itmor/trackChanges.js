@@ -1,5 +1,5 @@
 (function () {
-  function Events(options) {
+  function TrackChanges(options) {
 
     var storage = {
       workerCallInterval: 100
@@ -186,5 +186,5 @@
     construct(options);
   }
 
-  window.Events = Events;
+  window.TrackChanges = TrackChanges;
 })();
