@@ -2,9 +2,10 @@
 ![](https://i.ibb.co/tJNCxDZ/losgo3.png)
 
 Small library for creating and listening for js events. v1.0.1
-``
+
+```
  {new version of library in development]
-``
+```
  ******
 #### Browser support
 ###### IE 9+
