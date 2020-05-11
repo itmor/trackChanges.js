@@ -18,7 +18,13 @@ class TrackChanges {
   }
 
   // init methods
-  init() {}
+  init() {
+    if (this.getEnv() === 'nodejs') {
+      this.nodeScopeInit();
+    } else {
+      this.browserScopeInit();
+    }
+  }
 
   browserScopeInit() {}
 
