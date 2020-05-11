@@ -5,6 +5,7 @@ class TrackChanges {
 
   settings = {
     workerCallInterval: null,
+    scope: null,
     scopeName: 'TrackChanges',
   };
 
