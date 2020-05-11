@@ -18,12 +18,17 @@ class TrackChanges {
   }
 
   // init methods
-  init() {
-    this.scopeInit(this.initStorage);
-  }
+  init() {}
 
-  scopeInit(callback) {
-    callback();
+  browserScopeInit() {}
+
+  nodeScopeInit() {}
+
+  getEnv() {
+    if (typeof module !== 'undefined') {
+      return 'nodejs';
+    }
+    return 'browser';
   }
 
   initStorage() {}
