@@ -1,0 +1,12 @@
+{
+  "extends": ["wesbos"],
+  "rules": {
+    "no-console": 2,
+    "class-methods-use-this": 0,
+    "lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ]
+  }
+}
