@@ -21,15 +21,23 @@ class TrackChanges {
   // init methods
   init() {
     if (this.getEnv() === 'nodejs') {
-      this.nodeScopeInit();
+      this.scopeInit(global);
     } else {
-      this.browserScopeInit();
+      this.scopeInit(window);
     }
   }
 
-  browserScopeInit() {}
+  scopeInit(globalObject) {
+    if (typeof globalObject[this.settings.scopeName] === 'undefined') {
+      globalObject[this.settings.scopeName] = {
+        storage: null,
+      };
 
-  nodeScopeInit() {}
+      const [storage] = globalObject[this.settings.scopeName].storage;
+
+      this.initStorage(storage);
+    }
+  }
 
   getEnv() {
     if (typeof module !== 'undefined') {
@@ -38,7 +46,7 @@ class TrackChanges {
     return 'browser';
   }
 
-  initStorage() {}
+  initStorage(storage) {}
 }
 
 // export globals
