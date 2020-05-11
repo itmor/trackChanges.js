@@ -5,6 +5,7 @@ class TrackChanges {
 
   settings = {
     workerCallInterval: null,
+    scopeName: 'TrackChanges',
   };
 
   constructor(workerCallInterval = 100) {
@@ -16,9 +17,14 @@ class TrackChanges {
     }
   }
 
-  init() {}
+  // init methods
+  init() {
+    this.scopeInit(this.initStorage);
+  }
 
-  scopeInit() {}
+  scopeInit(callback) {
+    callback();
+  }
 
   initStorage() {}
 }
