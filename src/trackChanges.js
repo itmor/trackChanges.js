@@ -136,7 +136,7 @@
         dispatcher(eventName, callback, 'removeTask');
       }
     }
-
+ 
     this.add = function (descriptionEvent, morph) {
       if (typeof descriptionEvent === 'object' && morph === undefined) {
         Object.keys(descriptionEvent).forEach(function (key) {
