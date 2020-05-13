@@ -3,7 +3,7 @@ class TrackChanges {
     workerActive: false,
   };
 
-  settings = {
+  vars = {
     workerCallInterval: null,
     mainScopeName: 'TrackChanges',
     storage: null,
@@ -11,7 +11,7 @@ class TrackChanges {
 
   constructor(workerCallInterval = 100) {
     if (typeof workerCallInterval === 'number' && workerCallInterval > 0) {
-      this.settings.workerCallInterval = workerCallInterval;
+      this.vars.workerCallInterval = workerCallInterval;
       this.init();
     } else {
       throw new Error('Interval is incorrect');
@@ -28,14 +28,13 @@ class TrackChanges {
   }
 
   scopeStorageInit(globalObject) {
-    const storageLink = globalObject[`${this.settings.mainScopeName}Storage`];
+    const storageLink = globalObject[`${this.vars.mainScopeName}Storage`];
 
     if (typeof storageLink === 'undefined') {
-      // add storage scope
-      globalObject[`${this.settings.mainScopeName}Storage`] = {};
-      // copy storage scope link
-      this.settings.storage =
-        globalObject[`${this.settings.mainScopeName}Storage`];
+      globalObject[`${this.vars.mainScopeName}Storage`] = {};
+
+      this.vars.storage = globalObject[`${this.vars.mainScopeName}Storage`];
+
       this.initStorage();
     }
   }
@@ -48,8 +47,8 @@ class TrackChanges {
   }
 
   initStorage() {
-    this.settings.storage.tasks = [];
-    this.settings.storage.descriptions = {};
+    this.vars.storage.tasks = [];
+    this.vars.storage.descriptions = {};
   }
 }
 
