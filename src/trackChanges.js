@@ -5,8 +5,8 @@ class TrackChanges {
 
   settings = {
     workerCallInterval: null,
-    scope: null,
-    scopeName: 'TrackChanges',
+    mainScopeName: 'TrackChanges',
+    storage: null,
   };
 
   constructor(workerCallInterval = 100) {
@@ -21,21 +21,22 @@ class TrackChanges {
   // init methods
   init() {
     if (this.getEnv() === 'nodejs') {
-      this.scopeInit(global);
+      this.scopeStorageInit(global);
     } else {
-      this.scopeInit(window);
+      this.scopeStorageInit(window);
     }
   }
 
-  scopeInit(globalObject) {
-    if (typeof globalObject[this.settings.scopeName] === 'undefined') {
-      globalObject[this.settings.scopeName] = {
-        storage: null,
-      };
+  scopeStorageInit(globalObject) {
+    const storageLink = globalObject[`${this.settings.mainScopeName}Storage`];
 
-      const [storage] = globalObject[this.settings.scopeName].storage;
-
-      this.initStorage(storage);
+    if (typeof storageLink === 'undefined') {
+      // add storage scope
+      globalObject[`${this.settings.mainScopeName}Storage`] = {};
+      // copy storage scope link
+      this.settings.storage =
+        globalObject[`${this.settings.mainScopeName}Storage`];
+      this.initStorage();
     }
   }
 
@@ -46,7 +47,10 @@ class TrackChanges {
     return 'browser';
   }
 
-  initStorage(storage) {}
+  initStorage() {
+    this.settings.storage.tasks = [];
+    this.settings.storage.descriptions = {};
+  }
 }
 
 // export globals
