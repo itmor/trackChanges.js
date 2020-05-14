@@ -80,6 +80,32 @@ class TrackChanges {
     this.taskHandler();
   }
 
+  removeListener(nameTask, callBack) {
+    // get task in storage
+    for (
+      let taskCount = 0;
+      taskCount < this.vars.storage.tasks.length;
+      taskCount += 1
+    ) {
+      // get task in storage
+      if (this.vars.storage.tasks[taskCount].taskName === nameTask) {
+        const currentTask = this.vars.storage.tasks[taskCount];
+        // get callbacks in task
+        for (
+          let callBackCount = 0;
+          callBackCount < currentTask.callBacks.length;
+          callBackCount += 1
+        ) {
+          const currentCallBack = currentTask.callBacks[callBackCount];
+          // delete callback in task callbacks
+          if (currentCallBack === callBack) {
+            currentTask.callBacks.splice(callBackCount, 1);
+          }
+        }
+      }
+    }
+  }
+
   addTask(data) {
     this.vars.storage.tasks.push(data);
   }
