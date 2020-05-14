@@ -50,6 +50,10 @@ class TrackChanges {
     this.vars.storage.worker = this.worker;
   }
 
+  watch(name, valueFunc) {
+    // empty
+  }
+
   worker() {
     // empty
   }
