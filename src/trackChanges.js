@@ -38,6 +38,8 @@ class TrackChanges {
       this.vars.storage = globalObject[`${this.vars.mainScopeName}Storage`];
 
       this.initStorage();
+    } else {
+      this.vars.storage = globalObject[`${this.vars.mainScopeName}Storage`];
     }
   }
 
@@ -67,6 +69,7 @@ class TrackChanges {
   addListener(name, callBack) {
     // add callback to task callback list
     const foundTask = this.getTask(name);
+
     foundTask.callBacks.push(callBack);
     // run taskHandler
     this.taskHandler();
@@ -79,7 +82,7 @@ class TrackChanges {
   getTask(name) {
     // return task in task storage
     for (const task of this.vars.storage.tasks) {
-      if (name === task.name) {
+      if (name === task.taskName) {
         return task;
       }
     }
@@ -100,8 +103,27 @@ class TrackChanges {
     if (this.state.taskHandlerActive === false) {
       this.state.taskHandlerActive = true;
 
-      const worker = setInterval(() => {
+      const handler = setInterval(() => {
+        // disable the handler if there are no tasks
+        if (this.vars.storage.tasks.length === 0) {
+          this.vars.state.taskHandlerActive = false;
+          clearInterval(handler);
+        }
         // run handle
+        for (const task of this.vars.storage.tasks) {
+          // check changed value
+          if (
+            task.remove === false &&
+            task.value() !== task.oldValue &&
+            task.callBacks.length > 0
+          ) {
+            // run callbacks in task
+            for (const callBack of task.callBacks) {
+              callBack(task.value());
+              task.oldValue = task.value();
+            }
+          }
+        }
       }, this.vars.taskHandlerCallInterval);
     }
   }
