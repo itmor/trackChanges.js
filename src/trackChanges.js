@@ -1,17 +1,20 @@
 class TrackChanges {
   state = {
-    workerActive: false,
+    taskHandlerActive: false,
   };
 
   vars = {
-    workerCallInterval: null,
+    taskHandlerCallInterval: null,
     mainScopeName: 'TrackChanges',
     storage: null,
   };
 
-  constructor(workerCallInterval = 100) {
-    if (typeof workerCallInterval === 'number' && workerCallInterval > 0) {
-      this.vars.workerCallInterval = workerCallInterval;
+  constructor(taskHandlerCallInterval = 100) {
+    if (
+      typeof taskHandlerCallInterval === 'number' &&
+      taskHandlerCallInterval > 0
+    ) {
+      this.vars.taskHandlerCallInterval = taskHandlerCallInterval;
       this.init();
     } else {
       throw new Error('Interval is incorrect');
@@ -47,7 +50,7 @@ class TrackChanges {
 
   initStorage() {
     this.vars.storage.tasks = [];
-    this.vars.storage.worker = this.worker;
+    this.vars.storage.taskHandler = this.taskHandler;
   }
 
   watch(name, valueFunc) {
@@ -65,8 +68,8 @@ class TrackChanges {
     // add callback to task callback list
     const foundTask = this.getTask(name);
     foundTask.callBacks.push(callBack);
-    // run worker
-    this.worker();
+    // run taskHandler
+    this.taskHandler();
   }
 
   addTask(data) {
@@ -91,8 +94,16 @@ class TrackChanges {
     }
   }
 
-  worker() {
+  taskHandler() {
     // run and delete task
+    // prevent multiple calling
+    if (this.state.taskHandlerActive === false) {
+      this.state.taskHandlerActive = true;
+
+      const worker = setInterval(() => {
+        // run handle
+      }, this.vars.taskHandlerCallInterval);
+    }
   }
 }
 
