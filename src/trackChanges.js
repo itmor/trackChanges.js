@@ -88,6 +88,14 @@ class TrackChanges {
     }
   }
 
+  addMarkerinTask(nameTask, markerName, markerValue) {
+    for (const task of this.vars.storage.tasks) {
+      if (nameTask === task.name) {
+        task[markerName] = markerValue;
+      }
+    }
+  }
+
   removeTask(name) {
     // add remove marker in task
     for (const task of this.vars.storage.tasks) {
