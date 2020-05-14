@@ -47,7 +47,6 @@ class TrackChanges {
 
   initStorage() {
     this.vars.storage.tasks = [];
-    this.vars.storage.descriptions = {};
     this.vars.storage.worker = this.worker;
   }
 
