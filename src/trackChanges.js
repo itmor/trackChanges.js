@@ -55,10 +55,10 @@ class TrackChanges {
     this.vars.storage.taskHandler = this.taskHandler;
   }
 
-  watch(name, valueFunc) {
+  watch(nameTask, valueFunc) {
     // add task
     this.addTask({
-      taskName: name,
+      taskName: nameTask,
       value: valueFunc,
       oldValue: valueFunc(),
       remove: false,
@@ -66,9 +66,9 @@ class TrackChanges {
     });
   }
 
-  addListener(name, callBack) {
+  addListener(nameTask, callBack) {
     // add callback to task callback list
-    const foundTask = this.getTask(name);
+    const foundTask = this.getTask(nameTask);
 
     foundTask.callBacks.push(callBack);
     // run taskHandler
@@ -79,28 +79,28 @@ class TrackChanges {
     this.vars.storage.tasks.push(data);
   }
 
-  getTask(name) {
+  getTask(nameTask) {
     // return task in task storage
     for (const task of this.vars.storage.tasks) {
-      if (name === task.taskName) {
+      if (nameTask === task.taskName) {
         return task;
       }
     }
   }
 
-  addMarkerinTask(nameTask, markerName, markerValue) {
+  addMarkerInTask(nameTask, markerName, markerValue) {
     for (const task of this.vars.storage.tasks) {
-      if (nameTask === task.name) {
+      if (nameTask === task.taskName) {
         task[markerName] = markerValue;
       }
     }
   }
 
-  removeTask(name) {
-    // add remove marker in task
-    for (const task of this.vars.storage.tasks) {
-      if (name === task.name) {
-        task.remove = true;
+  removeTask(nameTask) {
+    // delete array element
+    for (let i; i < this.vars.storage.tasks.length; i += 1) {
+      if (this.vars.storage.tasks[i].taskName === nameTask) {
+        this.vars.storage.tasks.splice(i, 1);
       }
     }
   }
@@ -119,6 +119,10 @@ class TrackChanges {
         }
         // run handle
         for (const task of this.vars.storage.tasks) {
+          // destroy the task if it is marked
+          if (task.remove === true) {
+            this.removeTask(task.taskName);
+          }
           // check changed value
           if (
             task.remove === false &&
