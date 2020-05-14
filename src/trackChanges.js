@@ -55,7 +55,7 @@ class TrackChanges {
     this.vars.storage.taskHandler = this.taskHandler;
   }
 
-  watch(nameTask, valueFunc) {
+  addObserver(nameTask, valueFunc) {
     // add task
     this.addTask({
       taskName: nameTask,
