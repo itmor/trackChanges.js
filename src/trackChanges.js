@@ -67,6 +67,11 @@ class TrackChanges {
 
   getTask(name) {
     // return task in task storage
+    for (const task of this.vars.storage.tasks) {
+      if (name === task.name) {
+        return task;
+      }
+    }
   }
 
   removeTask() {
