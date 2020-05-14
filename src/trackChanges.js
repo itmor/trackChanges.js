@@ -56,6 +56,7 @@ class TrackChanges {
       taskName: name,
       value: valueFunc,
       oldValue: valueFunc(),
+      remove: false,
     });
     // run worker
     this.worker();
@@ -74,8 +75,13 @@ class TrackChanges {
     }
   }
 
-  removeTask() {
+  removeTask(name) {
     // add remove marker in task
+    for (const task of this.vars.storage.tasks) {
+      if (name === task.name) {
+        task.remove = true;
+      }
+    }
   }
 
   worker() {
