@@ -51,7 +51,14 @@ class TrackChanges {
   }
 
   watch(name, valueFunc) {
-    // empty
+    // add task
+    this.addTask({
+      taskName: name,
+      value: valueFunc,
+      oldValue: valueFunc(),
+    });
+    // run worker
+    this.worker();
   }
 
   addTask(data) {
