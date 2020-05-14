@@ -18,16 +18,15 @@ class TrackChanges {
     }
   }
 
-  // init methods
   init() {
     if (this.getEnv() === 'nodejs') {
-      this.scopeStorageInit(global);
+      this.namespaceStorageInit(global);
     } else {
-      this.scopeStorageInit(window);
+      this.namespaceStorageInit(window);
     }
   }
 
-  scopeStorageInit(globalObject) {
+  namespaceStorageInit(globalObject) {
     const storageLink = globalObject[`${this.vars.mainScopeName}Storage`];
 
     if (typeof storageLink === 'undefined') {
