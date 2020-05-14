@@ -54,6 +54,18 @@ class TrackChanges {
     // empty
   }
 
+  addTask(data) {
+    this.vars.storage.tasks.push(data);
+  }
+
+  getTask(name) {
+    // return task in task storage
+  }
+
+  removeTask() {
+    // add remove marker in task
+  }
+
   worker() {
     // empty
   }
