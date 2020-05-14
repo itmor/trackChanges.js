@@ -57,7 +57,14 @@ class TrackChanges {
       value: valueFunc,
       oldValue: valueFunc(),
       remove: false,
+      callBacks: [],
     });
+  }
+
+  addListener(name, callBack) {
+    // add callback to task callback list
+    const foundTask = this.getTask(name);
+    foundTask.callBacks.push(callBack);
     // run worker
     this.worker();
   }
@@ -85,7 +92,7 @@ class TrackChanges {
   }
 
   worker() {
-    // empty
+    // run and delete task
   }
 }
 
