@@ -66,6 +66,11 @@ class TrackChanges {
     });
   }
 
+  removeObserver(nameTask) {
+    // delete task
+    this.addMarkerInTask(nameTask, 'remove', true);
+  }
+
   addListener(nameTask, callBack) {
     // add callback to task callback list
     const foundTask = this.getTask(nameTask);
@@ -98,7 +103,7 @@ class TrackChanges {
 
   removeTask(nameTask) {
     // delete array element
-    for (let i; i < this.vars.storage.tasks.length; i += 1) {
+    for (let i = 0; i < this.vars.storage.tasks.length; i += 1) {
       if (this.vars.storage.tasks[i].taskName === nameTask) {
         this.vars.storage.tasks.splice(i, 1);
       }
@@ -114,7 +119,7 @@ class TrackChanges {
       const handler = setInterval(() => {
         // disable the handler if there are no tasks
         if (this.vars.storage.tasks.length === 0) {
-          this.vars.state.taskHandlerActive = false;
+          this.state.taskHandlerActive = false;
           clearInterval(handler);
         }
         // run handle
