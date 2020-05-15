@@ -79,7 +79,7 @@ class TrackChanges {
     this.addMarkerInTask(nameTask, 'remove', true);
   }
 
-  addListener(nameTask, callBack) {
+  addHandler(nameTask, callBack) {
     if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
       throw new Error('Invalid data type argument');
     } else if (this.getTask(nameTask) === undefined) {
@@ -93,7 +93,7 @@ class TrackChanges {
     this.taskHandler();
   }
 
-  removeListener(nameTask, callBack) {
+  removeHandler(nameTask, callBack) {
     if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
       throw new Error('Invalid data type argument');
     } else if (this.getTask(nameTask) === undefined) {
