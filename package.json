@@ -3,9 +3,7 @@
   "version": "1.0.1",
   "description": "Library for tracking changes in variables of any data type.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/itmor/trackChanges.js.git"
