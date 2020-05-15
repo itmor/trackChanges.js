@@ -1,190 +1,195 @@
-(function () {
-  function Events(options) {
+class TrackChanges {
+  #state = {
+    taskHandlerActive: false,
+  };
 
-    var storage = {
-      workerCallInterval: 100
+  #vars = {
+    taskHandlerCallInterval: null,
+    mainScopeName: 'TrackChanges',
+    storage: null,
+  };
+
+  constructor(taskHandlerCallInterval = 100) {
+    if (
+      typeof taskHandlerCallInterval === 'number' &&
+      taskHandlerCallInterval > 0
+    ) {
+      this.#vars.taskHandlerCallInterval = taskHandlerCallInterval;
+      this.#init();
+    } else {
+      throw new Error('Interval is incorrect');
+    }
+  }
+
+  #init() {
+    if (this.#getEnv() === 'nodejs') {
+      this.#namespaceStorageInit(global);
+    } else {
+      this.#namespaceStorageInit(window);
+    }
+  }
+
+  #namespaceStorageInit(globalObject) {
+    const storageLink = globalObject[`${this.#vars.mainScopeName}Storage`];
+
+    if (typeof storageLink === 'undefined') {
+      globalObject[`${this.#vars.mainScopeName}Storage`] = {};
+
+      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
+
+      this.#initStorage();
+    } else {
+      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
+    }
+  }
+
+  #getEnv() {
+    if (typeof module !== 'undefined') {
+      return 'nodejs';
+    }
+    return 'browser';
+  }
+
+  #initStorage() {
+    this.#vars.storage.tasks = [];
+    this.#vars.storage.taskHandler = this.#taskHandler;
+  }
+
+  addObserver(nameTask, valueFunc) {
+    if (typeof nameTask !== 'string' || typeof valueFunc !== 'function') {
+      throw new Error('Wrong type of input parameters');
     }
 
-    var root = this;
+    this.#addTask({
+      taskName: nameTask,
+      value: valueFunc,
+      oldValue: valueFunc(),
+      remove: false,
+      callBacks: [],
+    });
+  }
 
-    var taskStorage = [];
-
-    var descriptionsEventsStorage = {};
-
-    var workerState = {
-      activated: false
+  removeObserver(nameTask) {
+    if (typeof nameTask !== 'string') {
+      throw new Error('Invalid data type argument');
+    } else if (this.#getTask(nameTask) === undefined) {
+      throw new Error('Unable to delete un created observer');
     }
 
-    var worker = function () {
-      if (workerState.activated === false) {
-        workerState.activated = true;
+    this.#addMarkerInTask(nameTask, 'remove', true);
+  }
 
-        var work = setInterval(function () {
+  addHandler(nameTask, callBack) {
+    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
+      throw new Error('Invalid data type argument');
+    } else if (this.#getTask(nameTask) === undefined) {
+      throw new Error('Unable to Subscribe to an Un-Created Observer');
+    }
 
-          if (taskStorage.length === 0) {
-            workerState.activated = false;
-            clearInterval(work);
+    const foundTask = this.#getTask(nameTask);
+    foundTask.callBacks.push(callBack);
+    this.#taskHandler();
+  }
+
+  removeHandler(nameTask, callBack) {
+    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
+      throw new Error('Invalid data type argument');
+    } else if (this.#getTask(nameTask) === undefined) {
+      throw new Error('It is not possible to remove a nonexistent handler');
+    }
+    // get task in storage
+    for (
+      let taskCount = 0;
+      taskCount < this.#vars.storage.tasks.length;
+      taskCount += 1
+    ) {
+      if (this.#vars.storage.tasks[taskCount].taskName === nameTask) {
+        const currentTask = this.#vars.storage.tasks[taskCount];
+        // get callbacks in task
+        for (
+          let callBackCount = 0;
+          callBackCount < currentTask.callBacks.length;
+          callBackCount += 1
+        ) {
+          const currentCallBack = currentTask.callBacks[callBackCount];
+          // delete callback in task callbacks
+          if (currentCallBack === callBack) {
+            currentTask.callBacks.splice(callBackCount, 1);
           }
-
-          for (var i = 0; i < taskStorage.length; i++) {
-            var currentTask = taskStorage[i];
-            var eventName = currentTask[0];
-            var callback = currentTask[1];
-            var activated = currentTask[2]['activated'];
-            var remove = currentTask[2]['remove'];
-            var once = currentTask[2]['once'];
-            var oldValue = currentTask[2]['oldValue'];
-            var typeEvent = currentTask[2]['type'];
-
-            if (typeEvent === 'triggerEvent') {
-              if (descriptionsEventsStorage[eventName].func() === true && activated === false) {
-                callback();
-                taskStorage[i][2]['activated'] = true;
-              }
-
-              if (remove === true) taskStorage.splice(i, 1);
-
-              if (once === true && activated === true) taskStorage.splice(i, 1);
-
-              if (activated === true && descriptionsEventsStorage[eventName].func() !== true) {
-                taskStorage[i][2]['activated'] = false;
-              }
-            } else if (typeEvent === 'morphEvent') {
-              if (descriptionsEventsStorage[eventName].value() !== oldValue && activated === false) {
-                callback();
-                taskStorage[i][2]['activated'] = true;
-                taskStorage[i][2]['oldValue'] = descriptionsEventsStorage[eventName].value();
-              }
-
-              if (remove === true) taskStorage.splice(i, 1);
-
-              if (once === true && activated === true) taskStorage.splice(i, 1);
-
-              if (activated === true && descriptionsEventsStorage[eventName].value() !== oldValue) {
-                taskStorage[i][2]['activated'] = false;
-              }
-            }
-          }
-        }, storage.workerCallInterval);
-      }
-    }
-
-    var addMarkerInTask = function (eventName, callback, marker) {
-      for (var i = 0; i < taskStorage.length; i++) {
-        if (taskStorage[i][0] === eventName && taskStorage[i][1] === callback) {
-          taskStorage[i][2][marker.name] = marker.value;
         }
       }
     }
-
-    var dispatcher = function (eventName, callback, action, onceMode) {
-      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'morph') {
-        taskStorage.push([
-          eventName,
-          callback,
-          {
-            activated: false,
-            remove: false,
-            once: onceMode,
-            type: 'morphEvent',
-            oldValue: descriptionsEventsStorage[eventName].value()
-          }
-        ]);
-
-        worker();
-      }
-
-      if (action === 'addTask' && descriptionsEventsStorage[eventName].type === 'trigger') {
-        taskStorage.push([
-          eventName,
-          callback,
-          {
-            activated: false,
-            remove: false,
-            once: onceMode,
-            type: 'triggerEvent'
-          }
-        ]);
-
-        worker();
-      }
-
-      if (action === 'removeTask' && descriptionsEventsStorage.hasOwnProperty(eventName) === true) {
-        addMarkerInTask(eventName, callback, {
-          name: 'remove',
-          value: true
-        });
-      }
-    }
-
-    this.on = function (eventName, callback, onceMode) {
-      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
-        throw new Error('Error adding listener. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
-      } else if (typeof eventName !== 'string' || typeof callback !== 'function' && (typeof onceMode !== 'boolean' || onceMode !== undefined)) {
-        throw new Error('Error adding listener. Scheme .on(string: eventName, function: callback, boolean: onceMode | undefined: onceMode )');
-      } else {
-        dispatcher(eventName, callback, 'addTask', onceMode);
-      }
-    }
-
-    this.off = function (eventName, callback) {
-      if (descriptionsEventsStorage.hasOwnProperty(eventName) === false) {
-        throw new Error('Error deleting handler. Event "' + eventName + '" has not been described, describe it using the .add (...) method');
-      } else if (typeof eventName !== 'string' || typeof callback !== 'function') {
-        throw new Error('Error remove listener. Scheme .off(string: eventName, function: callback)');
-      } else {
-        dispatcher(eventName, callback, 'removeTask');
-      }
-    }
-
-    this.add = function (descriptionEvent, morph) {
-      if (typeof descriptionEvent === 'object' && morph === undefined) {
-        Object.keys(descriptionEvent).forEach(function (key) {
-          if (typeof descriptionEvent[key] === 'function') {
-            descriptionsEventsStorage[key] = {
-              func: descriptionEvent[key],
-              type: 'trigger'
-            }
-          } else {
-            throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
-          }
-        });
-      } else if (typeof descriptionEvent === 'object' && morph === 'morph') {
-        Object.keys(descriptionEvent).forEach(function (key) {
-          if (typeof descriptionEvent[key] === 'function') {
-            descriptionsEventsStorage[key] = {
-              value: descriptionEvent[key],
-              type: 'morph'
-            }
-          } else {
-            throw new Error('The description of the event with the name' + key + ' was created incorrectly, the key value is not a function.');
-          }
-        });
-      } else {
-        throw new Error('Incorrect event description.');
-      }
-    }
-
-    this.remove = function (nameDescriptionEvent) {
-      if (descriptionsEventsStorage.hasOwnProperty(nameDescriptionEvent) === true && typeof nameDescriptionEvent === 'string') {
-        delete descriptionsEventsStorage[nameDescriptionEvent];
-      }
-    }
-
-    var construct = function (options) {
-      if (typeof options === 'object') {
-        extend(options, storage);
-      }
-    }
-
-    var extend = function (heir, parent) {
-      Object.keys(heir).forEach(function (key) {
-        parent[key] = heir[key];
-      });
-    }
-
-    construct(options);
   }
 
-  window.Events = Events;
-})();
+  #addTask(data) {
+    this.#vars.storage.tasks.push(data);
+  }
+
+  #getTask(nameTask) {
+    for (const task of this.#vars.storage.tasks) {
+      if (nameTask === task.taskName) {
+        return task;
+      }
+    }
+    return undefined;
+  }
+
+  #addMarkerInTask(nameTask, markerName, markerValue) {
+    for (const task of this.#vars.storage.tasks) {
+      if (nameTask === task.taskName) {
+        task[markerName] = markerValue;
+      }
+    }
+  }
+
+  #removeTask(nameTask) {
+    for (let i = 0; i < this.#vars.storage.tasks.length; i += 1) {
+      if (this.#vars.storage.tasks[i].taskName === nameTask) {
+        this.#vars.storage.tasks.splice(i, 1);
+      }
+    }
+  }
+
+  #taskHandler() {
+    // prevent multiple calling
+    if (this.#state.taskHandlerActive === false) {
+      this.#state.taskHandlerActive = true;
+
+      const handler = setInterval(() => {
+        // disable the handler if there are no tasks
+        if (this.#vars.storage.tasks.length === 0) {
+          this.#state.taskHandlerActive = false;
+          clearInterval(handler);
+        }
+        // run handle
+        for (const task of this.#vars.storage.tasks) {
+          // destroy the task if it is marked
+          if (task.remove === true) {
+            this.#removeTask(task.taskName);
+          }
+          // check changed value
+          if (
+            task.remove === false &&
+            task.value() !== task.oldValue &&
+            task.callBacks.length > 0
+          ) {
+            // run callbacks in task
+            for (const callBack of task.callBacks) {
+              setTimeout(() => {
+                callBack(task.value());
+              }, 0);
+              task.oldValue = task.value();
+            }
+          }
+        }
+      }, this.#vars.taskHandlerCallInterval);
+    }
+  }
+}
+
+// export globals
+if (typeof module !== 'undefined') {
+  module.exports = TrackChanges;
+} else {
+  window.TrackChanges = TrackChanges;
+}
