@@ -1,9 +1,9 @@
 class TrackChanges {
-  state = {
+  #state = {
     taskHandlerActive: false,
   };
 
-  vars = {
+  #vars = {
     taskHandlerCallInterval: null,
     mainScopeName: 'TrackChanges',
     storage: null,
@@ -14,45 +14,45 @@ class TrackChanges {
       typeof taskHandlerCallInterval === 'number' &&
       taskHandlerCallInterval > 0
     ) {
-      this.vars.taskHandlerCallInterval = taskHandlerCallInterval;
-      this.init();
+      this.#vars.taskHandlerCallInterval = taskHandlerCallInterval;
+      this.#init();
     } else {
       throw new Error('Interval is incorrect');
     }
   }
 
-  init() {
-    if (this.getEnv() === 'nodejs') {
-      this.namespaceStorageInit(global);
+  #init() {
+    if (this.#getEnv() === 'nodejs') {
+      this.#namespaceStorageInit(global);
     } else {
-      this.namespaceStorageInit(window);
+      this.#namespaceStorageInit(window);
     }
   }
 
-  namespaceStorageInit(globalObject) {
-    const storageLink = globalObject[`${this.vars.mainScopeName}Storage`];
+  #namespaceStorageInit(globalObject) {
+    const storageLink = globalObject[`${this.#vars.mainScopeName}Storage`];
 
     if (typeof storageLink === 'undefined') {
-      globalObject[`${this.vars.mainScopeName}Storage`] = {};
+      globalObject[`${this.#vars.mainScopeName}Storage`] = {};
 
-      this.vars.storage = globalObject[`${this.vars.mainScopeName}Storage`];
+      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
 
-      this.initStorage();
+      this.#initStorage();
     } else {
-      this.vars.storage = globalObject[`${this.vars.mainScopeName}Storage`];
+      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
     }
   }
 
-  getEnv() {
+  #getEnv() {
     if (typeof module !== 'undefined') {
       return 'nodejs';
     }
     return 'browser';
   }
 
-  initStorage() {
-    this.vars.storage.tasks = [];
-    this.vars.storage.taskHandler = this.taskHandler;
+  #initStorage() {
+    this.#vars.storage.tasks = [];
+    this.#vars.storage.taskHandler = this.#taskHandler;
   }
 
   addObserver(nameTask, valueFunc) {
@@ -60,7 +60,7 @@ class TrackChanges {
       throw new Error('Wrong type of input parameters');
     }
 
-    this.addTask({
+    this.#addTask({
       taskName: nameTask,
       value: valueFunc,
       oldValue: valueFunc(),
@@ -72,39 +72,39 @@ class TrackChanges {
   removeObserver(nameTask) {
     if (typeof nameTask !== 'string') {
       throw new Error('Invalid data type argument');
-    } else if (this.getTask(nameTask) === undefined) {
+    } else if (this.#getTask(nameTask) === undefined) {
       throw new Error('Unable to delete un created observer');
     }
 
-    this.addMarkerInTask(nameTask, 'remove', true);
+    this.#addMarkerInTask(nameTask, 'remove', true);
   }
 
   addHandler(nameTask, callBack) {
     if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
       throw new Error('Invalid data type argument');
-    } else if (this.getTask(nameTask) === undefined) {
+    } else if (this.#getTask(nameTask) === undefined) {
       throw new Error('Unable to Subscribe to an Un-Created Observer');
     }
 
-    const foundTask = this.getTask(nameTask);
+    const foundTask = this.#getTask(nameTask);
     foundTask.callBacks.push(callBack);
-    this.taskHandler();
+    this.#taskHandler();
   }
 
   removeHandler(nameTask, callBack) {
     if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
       throw new Error('Invalid data type argument');
-    } else if (this.getTask(nameTask) === undefined) {
+    } else if (this.#getTask(nameTask) === undefined) {
       throw new Error('It is not possible to remove a nonexistent handler');
     }
     // get task in storage
     for (
       let taskCount = 0;
-      taskCount < this.vars.storage.tasks.length;
+      taskCount < this.#vars.storage.tasks.length;
       taskCount += 1
     ) {
-      if (this.vars.storage.tasks[taskCount].taskName === nameTask) {
-        const currentTask = this.vars.storage.tasks[taskCount];
+      if (this.#vars.storage.tasks[taskCount].taskName === nameTask) {
+        const currentTask = this.#vars.storage.tasks[taskCount];
         // get callbacks in task
         for (
           let callBackCount = 0;
@@ -121,12 +121,12 @@ class TrackChanges {
     }
   }
 
-  addTask(data) {
-    this.vars.storage.tasks.push(data);
+  #addTask(data) {
+    this.#vars.storage.tasks.push(data);
   }
 
-  getTask(nameTask) {
-    for (const task of this.vars.storage.tasks) {
+  #getTask(nameTask) {
+    for (const task of this.#vars.storage.tasks) {
       if (nameTask === task.taskName) {
         return task;
       }
@@ -134,38 +134,38 @@ class TrackChanges {
     return undefined;
   }
 
-  addMarkerInTask(nameTask, markerName, markerValue) {
-    for (const task of this.vars.storage.tasks) {
+  #addMarkerInTask(nameTask, markerName, markerValue) {
+    for (const task of this.#vars.storage.tasks) {
       if (nameTask === task.taskName) {
         task[markerName] = markerValue;
       }
     }
   }
 
-  removeTask(nameTask) {
-    for (let i = 0; i < this.vars.storage.tasks.length; i += 1) {
-      if (this.vars.storage.tasks[i].taskName === nameTask) {
-        this.vars.storage.tasks.splice(i, 1);
+  #removeTask(nameTask) {
+    for (let i = 0; i < this.#vars.storage.tasks.length; i += 1) {
+      if (this.#vars.storage.tasks[i].taskName === nameTask) {
+        this.#vars.storage.tasks.splice(i, 1);
       }
     }
   }
 
-  taskHandler() {
+  #taskHandler() {
     // prevent multiple calling
-    if (this.state.taskHandlerActive === false) {
-      this.state.taskHandlerActive = true;
+    if (this.#state.taskHandlerActive === false) {
+      this.#state.taskHandlerActive = true;
 
       const handler = setInterval(() => {
         // disable the handler if there are no tasks
-        if (this.vars.storage.tasks.length === 0) {
-          this.state.taskHandlerActive = false;
+        if (this.#vars.storage.tasks.length === 0) {
+          this.#state.taskHandlerActive = false;
           clearInterval(handler);
         }
         // run handle
-        for (const task of this.vars.storage.tasks) {
+        for (const task of this.#vars.storage.tasks) {
           // destroy the task if it is marked
           if (task.remove === true) {
-            this.removeTask(task.taskName);
+            this.#removeTask(task.taskName);
           }
           // check changed value
           if (
@@ -180,7 +180,7 @@ class TrackChanges {
             }
           }
         }
-      }, this.vars.taskHandlerCallInterval);
+      }, this.#vars.taskHandlerCallInterval);
     }
   }
 }
