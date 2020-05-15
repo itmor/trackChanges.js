@@ -175,7 +175,9 @@ class TrackChanges {
           ) {
             // run callbacks in task
             for (const callBack of task.callBacks) {
-              callBack(task.value());
+              setTimeout(() => {
+                callBack(task.value());
+              }, 0);
               task.oldValue = task.value();
             }
           }
