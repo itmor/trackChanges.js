@@ -1,6 +1,6 @@
 {
   "name": "track-changes-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Library for tracking changes in variables of any data type.",
   "main": "index.js",
   "scripts": {},
