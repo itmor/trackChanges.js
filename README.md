@@ -4,9 +4,8 @@
 MutationObserver analog for all data types in JS.
 
  ******
-#### Browser support
-###### IE 9+
-###### Firefox 20+
+#### Support
+###### Node.js 10+
 ###### Chrome 30+
  ******
 #### Installation
