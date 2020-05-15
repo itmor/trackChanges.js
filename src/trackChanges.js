@@ -56,7 +56,10 @@ class TrackChanges {
   }
 
   addObserver(nameTask, valueFunc) {
-    // add task
+    if (typeof nameTask !== 'string' || typeof valueFunc !== 'function') {
+      throw new Error('Wrong type of input parameters');
+    }
+
     this.addTask({
       taskName: nameTask,
       value: valueFunc,
@@ -67,11 +70,21 @@ class TrackChanges {
   }
 
   removeObserver(nameTask) {
-    // delete task
+    if (typeof nameTask !== 'string') {
+      throw new Error('Invalid data type argument');
+    } else if (this.getTask(nameTask) === undefined) {
+      throw new Error('Unable to delete un created observer');
+    }
+
     this.addMarkerInTask(nameTask, 'remove', true);
   }
 
   addListener(nameTask, callBack) {
+    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
+      throw new Error('Invalid data type argument');
+    } else if (this.getTask(nameTask) === undefined) {
+      throw new Error('Unable to Subscribe to an Un-Created Observer');
+    }
     // add callback to task callback list
     const foundTask = this.getTask(nameTask);
 
@@ -81,6 +94,11 @@ class TrackChanges {
   }
 
   removeListener(nameTask, callBack) {
+    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
+      throw new Error('Invalid data type argument');
+    } else if (this.getTask(nameTask) === undefined) {
+      throw new Error('It is not possible to remove a nonexistent handler');
+    }
     // get task in storage
     for (
       let taskCount = 0;
@@ -117,6 +135,7 @@ class TrackChanges {
         return task;
       }
     }
+    return undefined;
   }
 
   addMarkerInTask(nameTask, markerName, markerValue) {
