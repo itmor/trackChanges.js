@@ -85,11 +85,9 @@ class TrackChanges {
     } else if (this.getTask(nameTask) === undefined) {
       throw new Error('Unable to Subscribe to an Un-Created Observer');
     }
-    // add callback to task callback list
-    const foundTask = this.getTask(nameTask);
 
+    const foundTask = this.getTask(nameTask);
     foundTask.callBacks.push(callBack);
-    // run taskHandler
     this.taskHandler();
   }
 
@@ -105,7 +103,6 @@ class TrackChanges {
       taskCount < this.vars.storage.tasks.length;
       taskCount += 1
     ) {
-      // get task in storage
       if (this.vars.storage.tasks[taskCount].taskName === nameTask) {
         const currentTask = this.vars.storage.tasks[taskCount];
         // get callbacks in task
@@ -129,7 +126,6 @@ class TrackChanges {
   }
 
   getTask(nameTask) {
-    // return task in task storage
     for (const task of this.vars.storage.tasks) {
       if (nameTask === task.taskName) {
         return task;
@@ -147,7 +143,6 @@ class TrackChanges {
   }
 
   removeTask(nameTask) {
-    // delete array element
     for (let i = 0; i < this.vars.storage.tasks.length; i += 1) {
       if (this.vars.storage.tasks[i].taskName === nameTask) {
         this.vars.storage.tasks.splice(i, 1);
@@ -156,7 +151,6 @@ class TrackChanges {
   }
 
   taskHandler() {
-    // run and delete task
     // prevent multiple calling
     if (this.state.taskHandlerActive === false) {
       this.state.taskHandlerActive = true;
