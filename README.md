@@ -5,7 +5,7 @@
 ![](https://img.shields.io/github/license/itmor/trackChanges.js)<br />
 
 ******
-###MutationObserver analog for all data types in JS.
+### MutationObserver analog for all data types in JS.
 #### Support
 ###### Node.js 10+
 ###### Chrome 30+
