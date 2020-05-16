@@ -56,7 +56,7 @@ trackChanges.addHandler('numObserv', numHandler);
 create a function that will be called when the variable changes, the function argument will be its changed value 
 **/
 function numHandler(modifiedResult) {
-  console.log(`Object key changed to: ${modifiedResult}`)
+  console.log(`Num changed to: ${modifiedResult}`)
 }
 
 ```
