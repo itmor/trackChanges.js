@@ -1,6 +1,6 @@
 
- # TrackChanges.js ![](https://i.ibb.co/FxNbZ0r/track-Changes-Logo-Min2.png)
-
+ # TrackChanges.js 
+![](https://i.ibb.co/FxNbZ0r/track-Changes-Logo-Min2.png)
 MutationObserver analog for all data types in JS.
 
  ******
