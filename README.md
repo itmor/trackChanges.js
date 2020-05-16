@@ -1,5 +1,5 @@
 
- # ⏹️ TrackChanges.js 
+ # 👁️‍ TrackChanges.js 
 
 MutationObserver analog for all data types in JS.
 
