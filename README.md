@@ -23,6 +23,7 @@ Include the library in a file
 const TrackChanges = require('track-changes-js');
 const trackChanges = new TrackChanges();
 ```
+******
 #### Installation for browser
 ```
 git clone https://github.com/itmor/trackChanges.js.git
@@ -39,6 +40,7 @@ Include the library in a file
 // create a class object
 const trackChanges = new TrackChanges();
 ```
+******
 #### Usage example
 ```javascript
 // tracked variable
