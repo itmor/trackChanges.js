@@ -7,11 +7,6 @@
   - uses global space, you can control observers from any file
   - does not load, uses 1 global loop
   - easy to use and can be a replacement for MutationObserver in the browser
-
-
-#### Support
-###### Node.js 13+
-###### Chrome 30+
 ******
 #### Installation for node-js
 ```
