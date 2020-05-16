@@ -2,7 +2,7 @@
   "name": "track-changes-js",
   "version": "1.0.3",
   "description": "Library for tracking changes in variables of any data type.",
-  "main": "src/trackChanges.js",
+  "main": "build/trackChanges.min.js",
   "scripts": {},
   "repository": {
     "type": "git",
