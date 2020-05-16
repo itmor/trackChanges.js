@@ -58,6 +58,8 @@ class TrackChanges {
   addObserver(nameTask, valueFunc) {
     if (typeof nameTask !== 'string' || typeof valueFunc !== 'function') {
       throw new Error('Wrong type of input parameters');
+    }  else if (this.#getTask(nameTask) !== undefined) {
+      throw new Error('This name is already being used');
     }
 
     this.#addTask({
