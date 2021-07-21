@@ -10,10 +10,7 @@ class TrackChanges {
   };
 
   constructor(taskHandlerCallInterval = 100) {
-    if (
-      typeof taskHandlerCallInterval === 'number' &&
-      taskHandlerCallInterval > 0
-    ) {
+    if (typeof taskHandlerCallInterval === 'number' && taskHandlerCallInterval > 0) {
       this.#vars.taskHandlerCallInterval = taskHandlerCallInterval;
       this.#init();
     } else {
@@ -58,7 +55,7 @@ class TrackChanges {
   addObserver(nameTask, valueFunc) {
     if (typeof nameTask !== 'string' || typeof valueFunc !== 'function') {
       throw new Error('Wrong type of input parameters');
-    }  else if (this.#getTask(nameTask) !== undefined) {
+    } else if (this.#getTask(nameTask) !== undefined) {
       throw new Error('This name is already being used');
     }
 
@@ -100,19 +97,11 @@ class TrackChanges {
       throw new Error('It is not possible to remove a nonexistent handler');
     }
     // get task in storage
-    for (
-      let taskCount = 0;
-      taskCount < this.#vars.storage.tasks.length;
-      taskCount += 1
-    ) {
+    for (let taskCount = 0; taskCount < this.#vars.storage.tasks.length; taskCount += 1) {
       if (this.#vars.storage.tasks[taskCount].taskName === nameTask) {
         const currentTask = this.#vars.storage.tasks[taskCount];
         // get callbacks in task
-        for (
-          let callBackCount = 0;
-          callBackCount < currentTask.callBacks.length;
-          callBackCount += 1
-        ) {
+        for (let callBackCount = 0; callBackCount < currentTask.callBacks.length; callBackCount += 1) {
           const currentCallBack = currentTask.callBacks[callBackCount];
           // delete callback in task callbacks
           if (currentCallBack === callBack) {
@@ -170,11 +159,7 @@ class TrackChanges {
             this.#removeTask(task.taskName);
           }
           // check changed value
-          if (
-            task.remove === false &&
-            task.value() !== task.oldValue &&
-            task.callBacks.length > 0
-          ) {
+          if (task.remove === false && task.value() !== task.oldValue && task.callBacks.length > 0) {
             // run callbacks in task
             for (const callBack of task.callBacks) {
               setTimeout(() => {
