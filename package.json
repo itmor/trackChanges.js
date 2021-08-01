@@ -1,9 +1,11 @@
 {
   "name": "track-changes-js",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Library for tracking changes in variables of any data type.",
   "main": "build/trackChanges.min.js",
-  "scripts": {},
+  "scripts": {
+    "start": "gulp"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/itmor/trackChanges.js.git"
@@ -26,7 +28,7 @@
     "gulp-plumber": "^1.2.1",
     "gulp-rename": "^2.0.0",
     "gulp-terser": "^1.2.0",
-    "jshint": "^2.11.0"
-  },
-  "dependencies": {}
+    "jshint": "^2.11.0",
+    "prettier": "^2.3.2"
+  }
 }
