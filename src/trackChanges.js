@@ -1,180 +1,111 @@
 class TrackChanges {
   #state = {
-    taskHandlerActive: false,
+    workerIsActive: false,
+    envName: typeof module === 'undefined' ? 'browser' : 'nodejs',
   };
 
   #vars = {
-    taskHandlerCallInterval: null,
+    handlerCallInterval: null,
     mainScopeName: 'TrackChanges',
     storage: null,
   };
 
-  constructor(taskHandlerCallInterval = 100) {
-    if (typeof taskHandlerCallInterval === 'number' && taskHandlerCallInterval > 0) {
-      this.#vars.taskHandlerCallInterval = taskHandlerCallInterval;
-      this.#init();
-    } else {
-      throw new Error('Interval is incorrect');
-    }
+  constructor(handlerCallInterval = 100) {
+    this.#vars.handlerCallInterval = handlerCallInterval;
+    this.#init();
   }
 
   #init() {
-    if (this.#getEnv() === 'nodejs') {
-      this.#namespaceStorageInit(global);
+    this.#scopeInit(this.#state.envName === 'nodejs' ? global : window);
+  }
+
+  #scopeInit(globalObject) {
+    const scopeTemplate = `${this.#vars.mainScopeName}Storage`;
+
+    if (globalObject[scopeTemplate]) {
+      this.#vars.storage = globalObject[scopeTemplate];
     } else {
-      this.#namespaceStorageInit(window);
+      this.#initStorage(globalObject, scopeTemplate);
     }
   }
 
-  #namespaceStorageInit(globalObject) {
-    const storageLink = globalObject[`${this.#vars.mainScopeName}Storage`];
-
-    if (typeof storageLink === 'undefined') {
-      globalObject[`${this.#vars.mainScopeName}Storage`] = {};
-
-      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
-
-      this.#initStorage();
-    } else {
-      this.#vars.storage = globalObject[`${this.#vars.mainScopeName}Storage`];
-    }
-  }
-
-  #getEnv() {
-    if (typeof module !== 'undefined') {
-      return 'nodejs';
-    }
-    return 'browser';
-  }
-
-  #initStorage() {
+  #initStorage(globalObject, scopeTemplate) {
+    this.#vars.storage = globalObject[scopeTemplate] = {};
     this.#vars.storage.tasks = [];
-    this.#vars.storage.taskHandler = this.#taskHandler;
+    this.#vars.storage.taskHandler = this.#worker;
   }
 
-  addObserver(nameTask, valueFunc) {
-    if (typeof nameTask !== 'string' || typeof valueFunc !== 'function') {
-      throw new Error('Wrong type of input parameters');
-    } else if (this.#getTask(nameTask) !== undefined) {
-      throw new Error('This name is already being used');
-    }
-
+  addObserver(name, valueFunc) {
     this.#addTask({
-      taskName: nameTask,
+      name,
       value: valueFunc,
       oldValue: valueFunc(),
       remove: false,
-      callBacks: [],
+      callbacks: [],
     });
   }
 
-  removeObserver(nameTask) {
-    if (typeof nameTask !== 'string') {
-      throw new Error('Invalid data type argument');
-    } else if (this.#getTask(nameTask) === undefined) {
-      throw new Error('Unable to delete un created observer');
-    }
-
-    this.#addMarkerInTask(nameTask, 'remove', true);
+  removeObserver(taskName) {
+    this.#addMarkerInTask(taskName, 'remove', true);
   }
 
-  addHandler(nameTask, callBack) {
-    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
-      throw new Error('Invalid data type argument');
-    } else if (this.#getTask(nameTask) === undefined) {
-      throw new Error('Unable to Subscribe to an Un-Created Observer');
-    }
-
-    const foundTask = this.#getTask(nameTask);
-    foundTask.callBacks.push(callBack);
-    this.#taskHandler();
+  addHandler(taskName, callback) {
+    this.#getTask(taskName).callbacks.push(callback);
+    this.#worker();
   }
 
-  removeHandler(nameTask, callBack) {
-    if (typeof nameTask !== 'string' || typeof callBack !== 'function') {
-      throw new Error('Invalid data type argument');
-    } else if (this.#getTask(nameTask) === undefined) {
-      throw new Error('It is not possible to remove a nonexistent handler');
-    }
-    // get task in storage
-    for (let taskCount = 0; taskCount < this.#vars.storage.tasks.length; taskCount += 1) {
-      if (this.#vars.storage.tasks[taskCount].taskName === nameTask) {
-        const currentTask = this.#vars.storage.tasks[taskCount];
-        // get callbacks in task
-        for (let callBackCount = 0; callBackCount < currentTask.callBacks.length; callBackCount += 1) {
-          const currentCallBack = currentTask.callBacks[callBackCount];
-          // delete callback in task callbacks
-          if (currentCallBack === callBack) {
-            currentTask.callBacks.splice(callBackCount, 1);
-          }
-        }
-      }
-    }
+  removeHandler(taskName, callback) {
+    const currentTask = this.#getTask(taskName);
+    const callbackIndex = currentTask.callbacks.findIndex((currentCallback) => callback === currentCallback);
+    currentTask.callbacks.splice(callbackIndex, 1);
   }
 
   #addTask(data) {
     this.#vars.storage.tasks.push(data);
   }
 
-  #getTask(nameTask) {
-    for (const task of this.#vars.storage.tasks) {
-      if (nameTask === task.taskName) {
-        return task;
-      }
-    }
-    return undefined;
+  #getTask(name) {
+    return this.#vars.storage.tasks.find((task) => task.name === name);
   }
 
-  #addMarkerInTask(nameTask, markerName, markerValue) {
-    for (const task of this.#vars.storage.tasks) {
-      if (nameTask === task.taskName) {
-        task[markerName] = markerValue;
-      }
-    }
+  #addMarkerInTask(taskName, markerName, markerValue) {
+    this.#vars.storage.tasks = this.#vars.storage.tasks.map((task) => ({ ...task, [markerName]: markerValue }));
   }
 
-  #removeTask(nameTask) {
-    for (let i = 0; i < this.#vars.storage.tasks.length; i += 1) {
-      if (this.#vars.storage.tasks[i].taskName === nameTask) {
-        this.#vars.storage.tasks.splice(i, 1);
-      }
-    }
+  #removeTask(name) {
+    const index = this.#vars.storage.tasks.findIndex((task) => task.name === name);
+    this.#vars.storage.tasks.splice(index, 1);
   }
 
-  #taskHandler() {
-    // prevent multiple calling
-    if (this.#state.taskHandlerActive === false) {
-      this.#state.taskHandlerActive = true;
+  #worker() {
+    if (this.#state.workerIsActive) {
+      return;
+    }
 
-      const handler = setInterval(() => {
-        // disable the handler if there are no tasks
-        if (this.#vars.storage.tasks.length === 0) {
-          this.#state.taskHandlerActive = false;
-          clearInterval(handler);
+    this.#state.workerIsActive = true;
+
+    const handler = setInterval(() => {
+      if (!this.#vars.storage.tasks.length) {
+        this.#state.workerIsActive = false;
+        clearInterval(handler);
+      }
+
+      for (const task of this.#vars.storage.tasks) {
+        if (task.remove) {
+          this.#removeTask(task.name);
         }
-        // run handle
-        for (const task of this.#vars.storage.tasks) {
-          // destroy the task if it is marked
-          if (task.remove === true) {
-            this.#removeTask(task.taskName);
-          }
-          // check changed value
-          if (task.remove === false && task.value() !== task.oldValue && task.callBacks.length > 0) {
-            // run callbacks in task
-            for (const callBack of task.callBacks) {
-              setTimeout(() => {
-                callBack(task.value());
-              }, 0);
-              task.oldValue = task.value();
-            }
+
+        if (!task.remove && task.value() !== task.oldValue && task.callbacks.length) {
+          for (const callback of task.callbacks) {
+            setTimeout(() => callback(task.value()), 0);
+            task.oldValue = task.value();
           }
         }
-      }, this.#vars.taskHandlerCallInterval);
-    }
+      }
+    }, this.#vars.handlerCallInterval);
   }
 }
 
-// export globals
 if (typeof module !== 'undefined') {
   module.exports = TrackChanges;
 } else {
