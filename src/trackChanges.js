@@ -68,13 +68,13 @@ class TrackChanges {
     return this.#vars.storage.tasks.find((task) => task.name === name);
   }
 
-  #addMarkerInTask(taskName, markerName, markerValue) {
-    this.#vars.storage.tasks = this.#vars.storage.tasks.map((task) => ({ ...task, [markerName]: markerValue }));
-  }
-
   #removeTask(name) {
     const index = this.#vars.storage.tasks.findIndex((task) => task.name === name);
     this.#vars.storage.tasks.splice(index, 1);
+  }
+
+  #addMarkerInTask(taskName, markerName, markerValue) {
+    this.#vars.storage.tasks = this.#vars.storage.tasks.map((task) => ({ ...task, [markerName]: markerValue }));
   }
 
   #worker() {
