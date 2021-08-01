@@ -40,13 +40,21 @@ class TrackChanges {
       name,
       value: valueFunc,
       oldValue: valueFunc(),
-      remove: false,
+      removed: false,
       callbacks: [],
     });
   }
 
+  getObserverStruct(name) {
+    return { ...this.#getTask(name) };
+  }
+
+  getAllObserversStruct() {
+    return [...this.#vars.storage.tasks];
+  }
+
   removeObserver(taskName) {
-    this.#addMarkerInTask(taskName, 'remove', true);
+    this.#addMarkerInTask(taskName, 'removed', true);
   }
 
   addHandler(taskName, callback) {
@@ -91,11 +99,11 @@ class TrackChanges {
       }
 
       for (const task of this.#vars.storage.tasks) {
-        if (task.remove) {
+        if (task.removed) {
           this.#removeTask(task.name);
         }
 
-        if (!task.remove && task.value() !== task.oldValue && task.callbacks.length) {
+        if (!task.removed && task.value() !== task.oldValue && task.callbacks.length) {
           for (const callback of task.callbacks) {
             setTimeout(() => callback(task.value()), 0);
             task.oldValue = task.value();
