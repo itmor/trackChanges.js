@@ -55,7 +55,8 @@ function numHandler(modifiedResult) {
 }
 ```
 ### Importantly 
-```Each observer must have a unique name.
+```
+Each observer must have a unique name.
 You can create an unlimited number of observer handlers
 ```
 ******
