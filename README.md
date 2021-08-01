@@ -67,6 +67,7 @@ You can create an unlimited number of observer handlers
 |   addHandler(name: string, callback: function)|The method adds a handler for the observer. Accepts the name of the previously created observer and callback function. When the callback value is changed, the callback function is launched and its argument will be equal to the changed value|
 |   removeHandler(name: string, callback: function)|The method removes the handler for the observer. Accepts the observer name and callback function that was used when adding the handler|
 |   getObserverStruct(name: string)|With this method you can get the observer structure, output data { name: string; value: function; oldValue: any; removed: boolean; callbacks: Array<Function>}|
+|   getAllObserversStruct()|With this method you can get the structure in all available observers, output data Array<{ name: string; value: function; oldValue: any; removed: boolean; callbacks: Array<Function>}>|
 
 ### Dev
 Establish dependency
