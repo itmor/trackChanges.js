@@ -54,7 +54,7 @@ function numHandler(modifiedResult) {
   console.log(`Num changed to: ${ modifiedResult }`);
 }
 ```
-###Importantly 
+### Importantly 
 ```Each observer must have a unique name.
 You can create an unlimited number of observer handlers
 ```
